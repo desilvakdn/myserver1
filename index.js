@@ -1,23 +1,72 @@
 const express = require("express");
-const request = require("request");
 
 const app = express();
-const API_URL =
-  "https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=user_get_details&uid=3"; // Replace this URL with your own
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
 
-app.get("/api", (req, res) => {
-  request({ url: `${API_URL}` }, (error, response, body) => {
-    if (error || response.statusCode !== 200) {
-      return res.status(500).json({ type: "error", message: error.message });
-    }
+app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
+  fetch(
+    "https://raw.githubusercontent.com/desilvakdn/cjdcdcj4tgt55t53vr3f3fev/main/dejdejde.json"
+  )
+    .then((res12) => res12.json())
+    .then((data7382) => {
+      const api_ = data7382["random"];
+      fetch(
+        `https://syntaximos.com/?ihc_action=api-gate&ihch=${api_}&action=search_users&term_name=user_email&term_value=${req.params.usermail}`
+      )
+        .then((res23) => res23.json())
+        .then((data) => {
+          try {
+            const data1 = data["response"][0]["ID"];
+            fetch(
+              `https://syntaximos.com/?ihc_action=api-gate&ihch=${api_}&action=search_users&term_name=user_login&term_value=${req.params.username}`
+            )
+              .then((res0) => res0.json())
+              .then((data0) => {
+                var data12 = "";
+                try {
+                  data12 = data0["response"][0]["ID"];
+                } catch (error) {
+                  res.json({ subscription: "usernotfound" });
+                }
 
-    res.json(JSON.parse(body));
-  });
+                if (data1 === data12) {
+                  fetch(
+                    `https://syntaximos.com/?ihc_action=api-gate&ihch=${api_}&action=get_user_levels&uid=${data1}`
+                  )
+                    .then((res1) => res1.json())
+                    .then((data1) => {
+                      var b = "";
+                      try {
+                        b = data1["response"]["3"]["level_id"];
+                      } catch (error) {
+                        try {
+                          b = data1["response"]["2"]["level_id"];
+                        } catch (error) {
+                          b = "";
+                        }
+                      }
+
+                      if (b === "3") {
+                        res.json({ subscription: "premiumlifetime" });
+                      } else if (b === "2") {
+                        res.json({ subscription: "premiummonthly" });
+                      } else {
+                        res.json({ subscription: "free" });
+                      }
+                    });
+                }
+              });
+          } catch (error) {
+            res.json({ subscription: "usernotfound" });
+          }
+        })
+        .catch((error) => res.json({ subscription: "usernotfound" }));
+    })
+    .catch((error) => res.json({ subscription: "usernotfound" }));
 });
 
 const PORT = process.env.PORT || 5000;

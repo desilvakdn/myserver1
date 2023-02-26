@@ -69,5 +69,37 @@ app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
     .catch((error) => res.json({ subscription: "usernotfound" }));
 });
 
+app.get("/verify/:fname/:lfname/:usermail/:username", (req, res) => {
+  fetch(
+    "https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=desilvakdn2@gmail.com"
+  )
+    .then((el) => el.json())
+    .then((data) => {
+      if (data["response"]) {
+        var user_id = data["response"][0]["ID"];
+        fetch(
+          `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=user_get_details&uid=${user_id}`
+        )
+          .then((el) => el.json())
+          .then((data) => {
+            var f_name = data["response"]["first_name"];
+            var l_name = data["response"]["last_name"];
+            var email = data["response"]["user_email"];
+            var username = data["response"]["user_nicename"];
+            if (
+              f_name.toLowerCase() === req.params.fname &&
+              l_name.toLowerCase() === req.params.lfname &&
+              email.toLowerCase() === req.params.usermail &&
+              username.toLowerCase() === req.params.username
+            ) {
+              res.json({ response: "userfound" });
+            }
+          });
+      } else {
+        res.json({ response: "usernotfound" });
+      }
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

@@ -71,7 +71,7 @@ app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
 
 app.get("/verify/:fname/:lfname/:usermail/:username", (req, res) => {
   fetch(
-    "https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=desilvakdn2@gmail.com"
+    `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`
   )
     .then((el) => el.json())
     .then((data) => {
@@ -93,6 +93,8 @@ app.get("/verify/:fname/:lfname/:usermail/:username", (req, res) => {
               username.toLowerCase() === req.params.username
             ) {
               res.json({ response: "userfound" });
+            } else {
+              res.json({ response: "usernotfound" });
             }
           });
       } else {

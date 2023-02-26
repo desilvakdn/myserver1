@@ -75,7 +75,7 @@ app.get("/verify/:fname/:lfname/:usermail/:username", (req, res) => {
   )
     .then((el) => el.json())
     .then((data) => {
-      if (data["response"] === []) {
+      if (data["response"] !== []) {
         var user_id = data["response"][0]["ID"];
         fetch(
           `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=user_get_details&uid=${user_id}`

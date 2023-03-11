@@ -1,4 +1,5 @@
-const fetch = require("node-fetch");
+const fetch = (url) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
 
 const app = express();

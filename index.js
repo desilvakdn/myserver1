@@ -113,6 +113,5 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
     })
     .catch((error) => res.json({ response: "usernotfound" }));
 });
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

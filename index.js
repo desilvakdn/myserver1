@@ -168,7 +168,7 @@ app.post("/openai/ask", async (req, res) => {
     model: "text-davinci-003",
     prompt: `${command}:${text}`,
     temperature: 0,
-    max_tokens: 2048,
+    max_tokens: 4096,
   };
 
   // Send the request to the OpenAI API and return the generated text

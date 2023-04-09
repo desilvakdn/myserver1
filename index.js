@@ -1,6 +1,26 @@
 const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
+const { GoogleSpreadsheet } = require("google-spreadsheet");
+const creds = {
+  type: "service_account",
+  project_id: "blissful-canto-383209",
+  private_key_id: "6a05c00110c46a4ef108fc6e09d89edfb1cba6ab",
+  private_key:
+    "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCay4g4JcvjUb6z\nS56jdvuEAev/A1sR0Milse3vEFY8SeBpG/WxDcO5d/cjHSpC+8PaV65lTjzQWyXb\nfce29tBJ5PMwOLmOih9zhxHuLzVO3c4nKRHVcTzZ3zs3UCrEuSMSKqrjpMDComxj\ngQOl9K18XZ5gvRnEaqUjbpcOMmf5Gphrg3UpJG/0U+b0Zlwy2NKftdXNScPcLt7O\n9DZLOEKNpkscq+eJ2fXWdjMjh9F/jyZQPEYYpCMVz4jmWhtTIxozJKl81WyG4QH7\nGb6Yqv4mr+Ik6CoA9mWD4UMJAqi62+/3KOwgo07lN1ptW0L9XP53KtfC6qIu7o/Z\njUefRM+tAgMBAAECggEABy8R89UhOLwG9yg3xQtVEePK8YtU0ydW4IW47qLZ9bNS\nBF7FUMG8RyO/pvQIDZLEnKH8GHyAiwTn5V9ZgO7EbOGAvcisJ+bWHdTzapPrS+00\nT5Hy326BbfUTuPXx/i4/Z+zuAGGZho7mK9oFctK/qGlp28B67Sgr4NCVlxWUyLU2\nQn9kz7LWlA4yKWuDa/1OzJBx5xFaV0jW42i4NiOyvmHdlNf+VG7Pn5GNLEYpXggj\n5XVnR5eRPE5uoIG1Ol7ytm/AHbPsioPEZo/Kz/WYay/t6YArY2XejD/Xd+77CWXp\nbcj4mHjKIz/LMg+CD9gw3vOkBGVPe8SHTxEzdiDokQKBgQDS/VfGNe33O/wzuY7r\nzPVzBzQvkRsC98aRepSTlU1a14FTLtEu9imGKwCVYBaiTjcd6cE8h/2cAos3DjiW\n3jgfgBZMxsbd3o8jJEuItYHK3WXHxlbJSYbYDNRA5tY+s4kAVgrGLsyTCB370IqC\nsAo6nnBrncw757lNBIjijtU6FQKBgQC70URG3ggc/B4cOI3jf7VvWJoE4c5C6/er\nXhYFCCiG04KcCoHzP7gBto4W0Cpi5fhL8AeUXC8bOSu/esJi/i7FOEGzaL6Iuo77\n+dh9XiO9V3wXTZnYnA8kPmoUtjBfZDVzCu02yIWAZR85VoRmS7PrhTCDoAUd7aa2\n5KEy/3ydOQKBgQCfBalJUE5aAFEW3y10VhdNKknP7CsSspNsBJrFHUufQzxK6Mdr\nAMfNQs3+x9xnWlI6bnthVxHzqwsoZMSMGVLtkwm7tjoe8Waq0ulHUZ5Qu0vCJaA1\nuAA1CH5VqGYj/gctRKx8MLupuf13VPeAhpQ/GDmdMuLC5+UGwns1Xvgg/QKBgQC0\nnCKaO3110gRqgv//G5ov/vXtZ+9fb2b1xj5KjHPcY50fzQL2Ffouu4yb54Y7IIbL\nD4Faa+NovGuTcMtpQqFbSiP0EO/Yr/471SEYPeUEeRJ9nkQphrkQ02xTinet48F6\nZbGDkwS+WX/TNZ2QeZAFFkl26fTBuP0ut2FEl2cQEQKBgHHY4Ss2lDMmaEk9+8ZR\nZzvXbbHX5YiP/EDvpG5W6eQalhwrQym+S9D6qySwXLU00Po4CrJlA31oI1iko7nm\nXOuZKym5FnHg0W86PnwzKzmfhMkFcVqMh2DNQR7SLVzI7x689KGk7nBOKiI9BJN3\nPBY/M/lgxTbZJV6Q0ix/x8d8\n-----END PRIVATE KEY-----\n",
+  client_email: "fiverrmate@blissful-canto-383209.iam.gserviceaccount.com",
+  client_id: "115188836877549196740",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url:
+    "https://www.googleapis.com/robot/v1/metadata/x509/fiverrmate%40blissful-canto-383209.iam.gserviceaccount.com",
+};
+const doc = new GoogleSpreadsheet(
+  "1ySFcbZ3VYqL64esOtoWfhpQwvxv50sLH3BOwsBA1xS0"
+);
+const { google } = require("googleapis");
+
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
@@ -152,6 +172,69 @@ app.post("/openai/ask", async (req, res) => {
     body: text,
     answer: response.data.choices[0].text.trim(),
   });
+});
+
+async function writeToGoogleSheet(userEmail, quota) {
+  async function accessSpreadsheet() {
+    await doc.useServiceAccountAuth({
+      client_email: creds.client_email,
+      private_key: creds.private_key,
+    });
+
+    await doc.loadInfo(); // loads document properties and worksheets
+    const sheet = doc.sheetsByIndex[0]; // assumes data will be written to the first sheet
+
+    await sheet.addRow({ User: userEmail, Quota: JSON.stringify(quota) });
+    console.log(`Data written to sheet successfully!`);
+  }
+
+  accessSpreadsheet().catch(console.error);
+}
+
+app.get("/reveal/:usermail", async (req, res) => {
+  const auth = new google.auth.GoogleAuth({
+    credentials: creds,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  // Create a new Google Sheets API client with the loaded credentials
+  const sheets = google.sheets({ version: "v4", auth });
+
+  try {
+    // Load the values from the Google Sheet
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: "1ySFcbZ3VYqL64esOtoWfhpQwvxv50sLH3BOwsBA1xS0",
+      range: "Sheet1!A:B", // Replace with your sheet name and range
+    });
+
+    // Search for the user email in the loaded values
+    const values = response.data.values;
+    const index = values.findIndex((row) => row[0] === req.params.usermail);
+
+    // If the user email exists, return the corresponding quota value
+    if (index !== -1) {
+      const obj = JSON.parse(values[index][1]);
+      res.json({ obj: obj });
+    } else {
+      await writeToGoogleSheet(req.params.usermail, {
+        main_mate: 0,
+        gig_mate: 0,
+        mate_ai: 0,
+        auto_gig: 0,
+      });
+      res.json({
+        obj: {
+          main_mate: 0,
+          gig_mate: 0,
+          mate_ai: 0,
+          auto_gig: 0,
+        },
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ error: error });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

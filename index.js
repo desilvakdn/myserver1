@@ -174,14 +174,34 @@ app.post("/openai/ask", async (req, res) => {
   // Send the request to the OpenAI API and return the generated text
   const response = await openai.createCompletion(requestParams);
 
-  console.log(response);
-
-  res.status(200).json({
-    message: "Data processed successfully.",
-    question: command,
-    body: text,
-    answer: response,
-  });
+  response
+    .then((resp_) => {
+      if (resp_.status === 200) {
+        res.json({
+          status: resp_.status,
+          message: "Data processed successfully.",
+          question: command,
+          body: text,
+          answer: resp_.data.choices[0].text.trim(),
+        });
+      } else {
+        res.json({
+          status: resp_.status,
+          message: "Not Good",
+          question: command,
+          body: text,
+          answer: resp_.status,
+        });
+      }
+    })
+    .catch((err) => {
+      res.json({
+        message: "Something Went Wrong",
+        question: command,
+        body: text,
+        answer: err,
+      });
+    });
 });
 
 async function writeToGoogleSheet(userEmail, quota) {

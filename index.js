@@ -166,13 +166,16 @@ app.post("/openai/ask", async (req, res) => {
 
   const requestParams = {
     model: model,
-    prompt: `${command}:${text}`,
+    prompt: `${command}:\n\n${text}`,
     temperature: parseInt(temperature),
     max_tokens: parseInt(max_tokens),
   };
 
   // Send the request to the OpenAI API and return the generated text
   const response = await openai.createCompletion(requestParams);
+
+  console.log(response);
+
   res.status(200).json({
     message: "Data processed successfully.",
     question: command,

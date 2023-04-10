@@ -157,7 +157,7 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
 });
 
 app.post("/openai/ask", async (req, res) => {
-  const { command, text, api_key } = req.body;
+  const { command, text, api_key, model, temperature, max_tokens } = req.body;
 
   const configuration = new Configuration({
     apiKey: api_key,
@@ -165,10 +165,10 @@ app.post("/openai/ask", async (req, res) => {
   const openai = new OpenAIApi(configuration);
 
   const requestParams = {
-    model: "text-davinci-003",
+    model: model,
     prompt: `${command}:${text}`,
-    temperature: 0,
-    max_tokens: 3500,
+    temperature: parseInt(temperature),
+    max_tokens: parseInt(max_tokens),
   };
 
   // Send the request to the OpenAI API and return the generated text
@@ -177,7 +177,7 @@ app.post("/openai/ask", async (req, res) => {
     message: "Data processed successfully.",
     question: command,
     body: text,
-    answer: response.data.choices[0].text.trim(),
+    answer: response,
   });
 });
 

@@ -166,7 +166,7 @@ app.post("/openai/ask", async (req, res) => {
 
   const requestParams = {
     model: model,
-    prompt: `${command}:\n\n${text}`,
+    prompt: `${command}:${text}`,
     temperature: parseInt(temperature),
     max_tokens: parseInt(max_tokens),
   };

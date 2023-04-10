@@ -172,9 +172,9 @@ app.post("/openai/ask", async (req, res) => {
   };
 
   // Send the request to the OpenAI API and return the generated text
-  const response = await openai.createCompletion(requestParams);
 
-  response
+  openai
+    .createCompletion(requestParams)
     .then((resp_) => {
       if (resp_.status === 200) {
         res.json({

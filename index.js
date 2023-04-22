@@ -1,6 +1,7 @@
 const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
+const mysql = require("mysql2");
 const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const creds = {
@@ -102,6 +103,54 @@ app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
     .catch((error) => res.json({ subscription: "usernotfound" }));
 });
 
+app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
+  const email = req.params.useremail;
+
+  const pool = mysql
+    .createPool({
+      host: "89.117.9.154",
+      user: "u327402158_admin",
+      password: "Dinuka@1999",
+      database: "u327402158_user",
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    })
+    .promise();
+
+  try {
+    // check if user exists in database
+    const [rows] = await pool.query(
+      "SELECT * FROM `userdetails` WHERE `user_email` = ?",
+      [email]
+    );
+
+    if (rows.length > 0) {
+      // user exists, return entire row
+      res.json({ data: rows[0] });
+    } else {
+      // user does not exist, insert new row with email and current date
+      const currentDate = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
+      const [result] = await pool.query(
+        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`) VALUES (?, ?, ?)",
+        [email, currentDate, currentDate]
+      );
+
+      // return the inserted row
+      const [insertedRow] = await pool.query(
+        "SELECT * FROM `userdetails` WHERE id = ?",
+        [result.insertId]
+      );
+      res.json({ data: insertedRow[0] });
+    }
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
   fetch(
     `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`
@@ -119,6 +168,7 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
             var l_name = data["response"]["last_name"];
             var email = data["response"]["user_email"];
             var username = data["response"]["user_nicename"];
+            var userreg = data["response"]["user_registered"];
 
             fetch(
               `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=verify_user_level&uid=${user_id}&lid=${req.params.plan}`
@@ -134,7 +184,7 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   response_ === "1" &&
                   req.params.plan === "1"
                 ) {
-                  res.json({ response: "lobster" });
+                  res.json({ response: "lobster", userreg: userreg });
                 } else if (
                   f_name.toLowerCase() === req.params.fname &&
                   l_name.toLowerCase() === req.params.lfname &&
@@ -143,17 +193,17 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   response_ === "1" &&
                   req.params.plan != "1"
                 ) {
-                  res.json({ response: "lion" });
+                  res.json({ response: "lion", userreg: userreg });
                 } else {
-                  res.json({ response: "lam" });
+                  res.json({ response: "lam", userreg: userreg });
                 }
               });
           });
       } else {
-        res.json({ response: "usernotfound" });
+        res.json({ response: "usernotfound", userreg: "" });
       }
     })
-    .catch((error) => res.json({ response: "usernotfound" }));
+    .catch((error) => res.json({ response: "usernotfound", userreg: "" }));
 });
 
 app.post("/openai/ask", async (req, res) => {

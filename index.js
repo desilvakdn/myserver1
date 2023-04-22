@@ -129,14 +129,9 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
       // user exists, return entire row
       res.json({ data: rows[0] });
     } else {
-      // user does not exist, insert new row with email and current date
-      const currentDate = new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ");
       const [result] = await pool.query(
         "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`) VALUES (?, ?, ?)",
-        [email, currentDate, currentDate]
+        [email, req.params.useregistered, req.params.lastreset]
       );
 
       // return the inserted row

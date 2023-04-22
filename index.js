@@ -151,6 +151,14 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
   }
 });
 
+app.get("/getnoti", (req, res) => {
+  fetch(
+    "https://raw.githubusercontent.com/desilvakdn/myserver1/main/notice.txt"
+  )
+    .then((el) => el.text())
+    .then((data) => res.json({ noti: data }));
+});
+
 app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
   fetch(
     `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`

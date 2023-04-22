@@ -103,48 +103,56 @@ app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
     .catch((error) => res.json({ subscription: "usernotfound" }));
 });
 
-app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
-  const email = req.params.useremail;
+app.get(
+  "/checkset/:useremail/:useregistered/:lastreset/:status",
+  async (req, res) => {
+    const email = req.params.useremail;
 
-  const pool = mysql
-    .createPool({
-      host: "89.117.9.154",
-      user: "u327402158_admin",
-      password: "Dinuka@1999",
-      database: "u327402158_user",
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    })
-    .promise();
+    const pool = mysql
+      .createPool({
+        host: "89.117.9.154",
+        user: "u327402158_admin",
+        password: "Dinuka@1999",
+        database: "u327402158_user",
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+      })
+      .promise();
 
-  try {
-    // check if user exists in database
-    const [rows] = await pool.query(
-      "SELECT * FROM `userdetails` WHERE `user_email` = ?",
-      [email]
-    );
-
-    if (rows.length > 0) {
-      // user exists, return entire row
-      res.json({ data: rows[0] });
-    } else {
-      const [result] = await pool.query(
-        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`, `status`) VALUES (?, ?, ?,?)",
-        [email, req.params.useregistered, req.params.lastreset, 0]
+    try {
+      // check if user exists in database
+      const [rows] = await pool.query(
+        "SELECT * FROM `userdetails` WHERE `user_email` = ?",
+        [email]
       );
 
-      // return the inserted row
-      const [insertedRow] = await pool.query(
-        "SELECT * FROM `userdetails` WHERE id = ?",
-        [result.insertId]
-      );
-      res.json({ data: insertedRow[0] });
+      if (rows.length > 0) {
+        // user exists, return entire row
+        res.json({ data: rows[0] });
+      } else {
+        const [result] = await pool.query(
+          "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`, `status`) VALUES (?, ?, ?,?)",
+          [
+            email,
+            req.params.useregistered,
+            req.params.lastreset,
+            req.params.status,
+          ]
+        );
+
+        // return the inserted row
+        const [insertedRow] = await pool.query(
+          "SELECT * FROM `userdetails` WHERE id = ?",
+          [result.insertId]
+        );
+        res.json({ data: insertedRow[0] });
+      }
+    } catch (error) {
+      res.json({ error: error.message });
     }
-  } catch (error) {
-    res.json({ error: error.message });
   }
-});
+);
 
 app.get("/getnotice", async (req, res) => {
   fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")

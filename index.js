@@ -152,9 +152,7 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
 });
 
 app.get("/getnoti", (req, res) => {
-  fetch(
-    "https://raw.githubusercontent.com/desilvakdn/myserver1/main/notice.txt"
-  )
+  fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
     .then((el) => el.text())
     .then((data) => res.json({ noti: data }));
 });

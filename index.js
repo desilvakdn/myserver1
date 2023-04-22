@@ -195,7 +195,11 @@ app.get("/checkupdate/:useremail/:resetdate/:status", async (req, res) => {
 app.get("/getnoti", (req, res) => {
   fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
     .then((el) => el.text())
-    .then((data) => res.json({ noti: data }));
+    .then((data) => {
+      const l = data.split("|");
+      const s = new Date(l[1].trim());
+      res.json({ noti: l[0].trim, datemodi: s });
+    });
 });
 
 app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {

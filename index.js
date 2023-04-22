@@ -130,8 +130,8 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
       res.json({ data: rows[0] });
     } else {
       const [result] = await pool.query(
-        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`) VALUES (?, ?, ?)",
-        [email, req.params.useregistered, req.params.lastreset]
+        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`, `status`) VALUES (?, ?, ?)",
+        [email, req.params.useregistered, req.params.lastreset, 0]
       );
 
       // return the inserted row
@@ -146,7 +146,7 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
   }
 });
 
-app.get("/checkupdate/:useremail/:resetdate", async (req, res) => {
+app.get("/checkupdate/:useremail/:resetdate/:status", async (req, res) => {
   const email = req.params.useremail;
 
   const pool = mysql
@@ -175,8 +175,8 @@ app.get("/checkupdate/:useremail/:resetdate", async (req, res) => {
     if (rows.length > 0) {
       const id = rows[0].id;
       const [updateResult] = await pool.query(
-        "UPDATE `userdetails` SET `user_last_reset` = ? WHERE id = ?",
-        [req.params.resetdate, id]
+        "UPDATE `userdetails` SET `user_last_reset` = ?, `status` = ? WHERE id = ?",
+        [req.params.resetdate, req.params.status, id]
       );
       if (updateResult.affectedRows === 0) {
         return {};

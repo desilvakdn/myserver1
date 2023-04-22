@@ -130,7 +130,7 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
       res.json({ data: rows[0] });
     } else {
       const [result] = await pool.query(
-        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`, `status`) VALUES (?, ?, ?)",
+        "INSERT INTO `userdetails`(`user_email`, `user_registered`, `user_last_reset`, `status`) VALUES (?, ?, ?,?)",
         [email, req.params.useregistered, req.params.lastreset, 0]
       );
 

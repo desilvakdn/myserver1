@@ -146,6 +146,48 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
   }
 });
 
+app.get("/getnotice", async (req, res) => {
+  fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
+    .then((el) => el.text())
+    .then(async (data) => {
+      const secret = data.split("|");
+      const s = secret[0].trim();
+
+      const message = secret[1].trim();
+      const pool = mysql
+        .createPool({
+          host: "89.117.9.154",
+          user: "u327402158_admin",
+          password: "Dinuka@1999",
+          database: "u327402158_user",
+          waitForConnections: true,
+          connectionLimit: 10,
+          queueLimit: 0,
+        })
+        .promise();
+      try {
+        // Execute the SELECT query to check if the message is available in the first row of the table
+        const [rows] = await pool.query(
+          "SELECT message FROM `notice` WHERE id = 1"
+        );
+
+        // If the message is available in the first row, return it to the user
+        if (rows.length > 0 && rows[0].message === message) {
+          res.json({ message: "old" });
+        } else {
+          const [result] = await pool.query(
+            "UPDATE `notice` SET message = ? WHERE id = 1",
+            [message]
+          );
+
+          res.json({ message: s });
+        }
+      } catch (err) {
+        res.json({ error: err });
+      }
+    });
+});
+
 app.get("/checkupdate/:useremail/:resetdate/:status", async (req, res) => {
   const email = req.params.useremail;
 

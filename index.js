@@ -146,6 +146,52 @@ app.get("/checkset/:useremail/:useregistered/:lastreset", async (req, res) => {
   }
 });
 
+app.get("/checkupdate/:useremail/:resetdate", async (req, res) => {
+  const email = req.params.useremail;
+
+  const pool = mysql
+    .createPool({
+      host: "89.117.9.154",
+      user: "u327402158_admin",
+      password: "Dinuka@1999",
+      database: "u327402158_user",
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    })
+    .promise();
+
+  try {
+    // check if user exists in database
+    const [rows] = await pool.query(
+      "SELECT * FROM `userdetails` WHERE `user_email` = ?",
+      [email]
+    );
+
+    if (rows.length === 0) {
+      res.json({});
+    }
+
+    if (rows.length > 0) {
+      const id = rows[0].id;
+      const [updateResult] = await pool.query(
+        "UPDATE `userdetails` SET `user_last_reset` = ? WHERE id = ?",
+        [req.params.resetdate, id]
+      );
+      if (updateResult.affectedRows === 0) {
+        return {};
+      }
+      const [updatedRows] = await pool.query(
+        "SELECT * FROM `userdetails` WHERE id = ?",
+        [id]
+      );
+      res.json({ data: updatedRows[0] });
+    }
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 app.get("/getnoti", (req, res) => {
   fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
     .then((el) => el.text())

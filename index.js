@@ -154,6 +154,14 @@ app.get(
   }
 );
 
+app.get("/getf", async (req, res) => {
+  fetch(
+    "https://raw.githubusercontent.com/desilvakdn/notice/main/fiverrmate.json"
+  )
+    .then((el) => el.json())
+    .then((data) => res.json({ data: data }));
+});
+
 app.get("/getnotice", async (req, res) => {
   fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
     .then((el) => el.text())

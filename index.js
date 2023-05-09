@@ -162,6 +162,45 @@ app.get("/getf", async (req, res) => {
     .then((data) => res.json({ data: data }));
 });
 
+app.get("/sugge/:fname/:lname/:email/:suggestion", async (req, res) => {
+  const key = require("./service.json"); // Replace with your service account JSON file
+  const spreadsheetId = "11TpquhxsbLUFNXXeOGk2Jwjrmfn_ff8A9_tYD6-0Zts"; // Replace with the ID of your Google Sheet
+  const sheetName = "Sheet1"; // Replace with the name of your sheet
+  const columns = ["First Name", "Last Name", "Email", "Suggestion"]; // Define the column names
+  const firstName = req.params.fname;
+  const lastName = req.params.lname;
+  const email = req.params.email;
+  const suggestion = req.params.suggestion;
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: "v4", auth: client });
+
+  // Get the last row number of the sheet
+  const result = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${sheetName}!A:A`,
+    majorDimension: "COLUMNS",
+  });
+  const lastRow = result.data.values[0].length + 1;
+
+  // Create a new row with the provided data
+  const values = [[firstName, lastName, email, suggestion]];
+  const range = `${sheetName}!A${lastRow}:${String.fromCharCode(
+    64 + columns.length
+  )}${lastRow}`;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values },
+  });
+  res.json({ response: `Data appended to ${sheetName}!${range}` });
+});
+
 app.get("/getnotice", async (req, res) => {
   fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/notice.txt")
     .then((el) => el.text())

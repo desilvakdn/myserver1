@@ -378,8 +378,9 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
             )
               .then((el432) => el432.json())
               .then((data743) => {
-                var response_ = String(data743["response"]);
-                let plan__ = response_["level_id"];
+                var response_ = data743["response"];
+                const firstKey = Object.keys(response_)[0];
+                let plan__ = response_[firstKey]["level_id"];
                 if (
                   f_name.toLowerCase() === req.params.fname &&
                   l_name.toLowerCase() === req.params.lfname &&

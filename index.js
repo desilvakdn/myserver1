@@ -354,6 +354,60 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
     .catch((error) => res.json({ response: "usernotfound", userreg: "" }));
 });
 
+app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
+  fetch(
+    `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`
+  )
+    .then((el) => el.json())
+    .then((data) => {
+      if (data["response"] !== []) {
+        var user_id = data["response"][0]["ID"];
+        fetch(
+          `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=user_get_details&uid=${user_id}`
+        )
+          .then((el) => el.json())
+          .then((data) => {
+            var f_name = data["response"]["first_name"];
+            var l_name = data["response"]["last_name"];
+            var email = data["response"]["user_email"];
+            var username = data["response"]["user_nicename"];
+            var userreg = data["response"]["user_registered"];
+
+            fetch(
+              `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=get_user_levels&uid=${user_id}`
+            )
+              .then((el432) => el432.json())
+              .then((data743) => {
+                var response_ = String(data743["response"]);
+                let plan__ = response_["level_id"];
+                if (
+                  f_name.toLowerCase() === req.params.fname &&
+                  l_name.toLowerCase() === req.params.lfname &&
+                  email.toLowerCase() === req.params.usermail &&
+                  username.toLowerCase() === req.params.username &&
+                  plan__ === "1"
+                ) {
+                  res.json({ response: "lobster", userreg: userreg });
+                } else if (
+                  f_name.toLowerCase() === req.params.fname &&
+                  l_name.toLowerCase() === req.params.lfname &&
+                  email.toLowerCase() === req.params.usermail &&
+                  username.toLowerCase() === req.params.username &&
+                  (plan__ === "4" || plan__ === "5")
+                ) {
+                  res.json({ response: "lion", userreg: userreg });
+                } else {
+                  res.json({ response: "lam", userreg: userreg });
+                }
+              });
+          });
+      } else {
+        res.json({ response: "usernotfound", userreg: "" });
+      }
+    })
+    .catch((error) => res.json({ response: "usernotfound", userreg: "" }));
+});
+
 app.post("/openai/ask", async (req, res) => {
   const { command, text, api_key, model, temperature, max_tokens } = req.body;
 

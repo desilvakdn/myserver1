@@ -386,19 +386,25 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                 var response_ = data743["response"];
                 const firstKey = Object.keys(response_)[0];
                 let plan__ = response_[firstKey]["level_id"];
+
+                let a = req.params.fname;
+                let b = req.params.lfname;
+                let c = req.params.usermail;
+                let d = req.params.username;
+
                 if (
-                  f_name.toLowerCase() === req.params.fname &&
-                  l_name.toLowerCase() === req.params.lfname &&
-                  email.toLowerCase() === req.params.usermail &&
-                  username.toLowerCase() === req.params.username &&
+                  f_name.toLowerCase() === a.toLowerCase() &&
+                  l_name.toLowerCase() === b.toLowerCase() &&
+                  email.toLowerCase() === c.toLowerCase() &&
+                  username.toLowerCase() === d.toLowerCase() &&
                   plan__ === "1"
                 ) {
                   res.json({ response: "lobster", userreg: userreg });
                 } else if (
-                  f_name.toLowerCase() === req.params.fname &&
-                  l_name.toLowerCase() === req.params.lfname &&
-                  email.toLowerCase() === req.params.usermail &&
-                  username.toLowerCase() === req.params.username &&
+                  f_name.toLowerCase() === a.toLowerCase() &&
+                  l_name.toLowerCase() === b.toLowerCase() &&
+                  email.toLowerCase() === c.toLowerCase() &&
+                  username.toLowerCase() === d.toLowerCase() &&
                   (plan__ === "4" || plan__ === "5")
                 ) {
                   res.json({ response: "lion", userreg: userreg });

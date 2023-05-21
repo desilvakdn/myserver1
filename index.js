@@ -243,6 +243,20 @@ app.get("/getnotice", async (req, res) => {
     });
 });
 
+app.get("/api/:hash", async (req, res) => {
+  fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/hash.json")
+    .then((dl) => dl.json())
+    .then((data) => {
+      let u = data.data;
+
+      if (u === req.params.hash) {
+        res.json({ val: true });
+      } else {
+        res.json({ val: false });
+      }
+    });
+});
+
 app.get("/checkupdate/:useremail/:resetdate/:status", async (req, res) => {
   const email = req.params.useremail;
 

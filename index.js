@@ -329,7 +329,7 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
             var f_name = data["response"]["first_name"];
             var l_name = data["response"]["last_name"];
             var email = data["response"]["user_email"];
-            var username = data["response"]["user_nicename"];
+            var username = data["response"]["user_login"];
             var userreg = data["response"]["user_registered"];
 
             fetch(
@@ -389,7 +389,7 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
             var f_name = data["response"]["first_name"];
             var l_name = data["response"]["last_name"];
             var email = data["response"]["user_email"];
-            var username = data["response"]["user_nicename"];
+            var username = data["response"]["user_login"];
             var userreg = data["response"]["user_registered"];
 
             fetch(

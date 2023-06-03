@@ -249,7 +249,7 @@ app.get("/api/:hash", async (req, res) => {
     .then((data) => {
       let u = data.data;
 
-      if (u === req.params.hash) {
+      if (u.includes(req.params.hash)) {
         res.json({ val: true });
       } else {
         res.json({ val: false });

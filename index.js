@@ -398,8 +398,8 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
               .then((el432) => el432.json())
               .then((data743) => {
                 var response_ = data743["response"];
-                const firstKey = Object.keys(response_)[0];
-                let plan__ = response_[firstKey]["level_id"];
+                const firstKey = Object.keys(response_);
+                //let plan__ = response_[firstKey]["level_id"];
 
                 let a = req.params.fname;
                 let b = req.params.lfname;
@@ -411,19 +411,46 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   l_name.toLowerCase() === b.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
-                  plan__ === "1"
+                  (firstKey.includes("4") || firstKey.includes("5"))
                 ) {
-                  res.json({ response: "lobster", userreg: userreg });
+                  if (firstKey.includes("4")) {
+                    let expired = data743["response"]["4"].is_expired;
+                    if (!expired) {
+                      let expiretime = data743["response"]["4"].expire_time;
+
+                      res.json({
+                        response: "lion",
+                        userreg: userreg,
+                        end: expiretime,
+                      });
+                    } else {
+                      res.json({
+                        response: "lobster",
+                        userreg: userreg,
+                        end: false,
+                      });
+                    }
+                  } else {
+                    res.json({
+                      response: "lion",
+                      userreg: userreg,
+                      end: false,
+                    });
+                  }
                 } else if (
                   f_name.toLowerCase() === a.toLowerCase() &&
                   l_name.toLowerCase() === b.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
-                  (plan__ === "4" || plan__ === "5")
+                  firstKey.includes("1")
                 ) {
-                  res.json({ response: "lion", userreg: userreg });
+                  res.json({
+                    response: "lobster",
+                    userreg: userreg,
+                    end: false,
+                  });
                 } else {
-                  res.json({ response: "lam", userreg: userreg });
+                  res.json({ response: "lam", userreg: userreg, end: false });
                 }
               });
           });

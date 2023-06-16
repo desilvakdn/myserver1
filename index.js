@@ -373,6 +373,14 @@ app.get("/verify/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
     .catch((error) => res.json({ response: "usernotfound", userreg: "" }));
 });
 
+app.get("/announcements", (req, res) => {
+  fetch("https://raw.githubusercontent.com/desilvakdn/notice/main/news.json")
+    .then((el) => el.json())
+    .then((data) => {
+      res.json(data);
+    });
+});
+
 app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
   fetch(
     `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`

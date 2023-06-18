@@ -1,6 +1,7 @@
 const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
+
 const mysql = require("mysql2");
 const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
@@ -379,6 +380,34 @@ app.get("/announcements", (req, res) => {
     .then((data) => {
       res.json(data);
     });
+});
+
+app.get("/titlesai/:words/:api", async (req, res) => {
+  const openAi = new OpenAIApi(
+    new Configuration({
+      apiKey: req.params.api,
+    })
+  );
+
+  let word_ = req.params.words;
+  const command = `match the words and generate 5 most appropriate titles that starts with "I will". Title should include most of the words. Please don't use your own words.  Title character length should be no more than 65. Word List: [${word_}] `;
+
+  const response = await openAi.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: command }],
+  });
+
+  let response0 = response.data.choices[0].message.content.split("\n");
+
+  const removeBeforeIWill = response0.map((str) => {
+    const startIndex = str.indexOf("I will");
+    if (startIndex !== -1) {
+      return str.slice(startIndex);
+    }
+    return str;
+  });
+
+  res.json({ resp: removeBeforeIWill });
 });
 
 app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {

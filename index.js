@@ -410,26 +410,26 @@ app.get("/titlesai/:words/:api", async (req, res) => {
   res.json({ resp: removeBeforeIWill });
 });
 
-app.get("/desai/:words/:gig/:api", async (req, res) => {
+app.post("/desai", async (req, res) => {
+  const { words, inspired, api_key } = req.body;
+
   const openAi = new OpenAIApi(
     new Configuration({
-      apiKey: req.params.api,
+      apiKey: api_key,
     })
   );
 
-  let word_ = req.params.words;
-
   const command = `Analyze the following fiverr gig description and style of writing. Then create new gig description with well written structure and include  all of the following keywords naturally in the gig description. Don't include unnecessary contents. Make it little shorter.
 
-Keyword to be included:
+Keywords to be included:
 
-${word_}
+${words}
 
 logo design, business logo, minimalist logo, custom logo, minimalist, unique, minimal, luxury, modern
 
 Sample Gig Description:
 
-${req.params.gig}
+${inspired}
 `;
 
   const response = await openAi.createChatCompletion({

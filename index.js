@@ -410,6 +410,38 @@ app.get("/titlesai/:words/:api", async (req, res) => {
   res.json({ resp: removeBeforeIWill });
 });
 
+app.get("/desai/:words/:gig/:api", async (req, res) => {
+  const openAi = new OpenAIApi(
+    new Configuration({
+      apiKey: req.params.api,
+    })
+  );
+
+  let word_ = req.params.words;
+
+  const command = `Analyze the following fiverr gig description and style of writing. Then create new gig description with well written structure and include  all of the following keywords naturally in the gig description. Don't include unnecessary contents. Make it little shorter.
+
+Keyword to be included:
+
+${word_}
+
+logo design, business logo, minimalist logo, custom logo, minimalist, unique, minimal, luxury, modern
+
+Sample Gig Description:
+
+${req.params.gig}
+`;
+
+  const response = await openAi.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: command }],
+  });
+
+  let response0 = response.data.choices[0].message.content;
+
+  res.json({ resp: response0 });
+});
+
 app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
   fetch(
     `https://syntaximos.com/?ihc_action=api-gate&ihch=klOxPZlK7Nw5XPMOlMgbhRNQ3gZp8dU1Ev&action=search_users&term_name=user_email&term_value=${req.params.usermail}`

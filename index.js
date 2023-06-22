@@ -480,12 +480,31 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   l_name.toLowerCase() === b.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
-                  (firstKey.includes("4") || firstKey.includes("5"))
+                  (firstKey.includes("4") ||
+                    firstKey.includes("5") ||
+                    firstKey.includes("6"))
                 ) {
                   if (firstKey.includes("4")) {
                     let expired = data743["response"]["4"].is_expired;
                     if (!expired) {
                       let expiretime = data743["response"]["4"].expire_time;
+
+                      res.json({
+                        response: "lion",
+                        userreg: userreg,
+                        end: expiretime,
+                      });
+                    } else {
+                      res.json({
+                        response: "lobster",
+                        userreg: userreg,
+                        end: false,
+                      });
+                    }
+                  } else if (firstKey.includes("6")) {
+                    let expired = data743["response"]["6"].is_expired;
+                    if (!expired) {
+                      let expiretime = data743["response"]["6"].expire_time;
 
                       res.json({
                         response: "lion",

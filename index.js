@@ -27,9 +27,22 @@ const { google } = require("googleapis");
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
-app.use(
-  cors()
-);
+/* app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+
+    
+  })
+); */
+
+app.use(cors({
+  'allowedHeaders': ['sessionId', 'Content-Type'],
+  'exposedHeaders': ['sessionId'],
+  'origin': '*',
+  'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  'preflightContinue': false
+}));
 
 const limiter = rateLimit({
   windowMs: 100000, // 1 minute

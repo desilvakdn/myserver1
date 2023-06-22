@@ -34,11 +34,10 @@ app.use(
   })
 );
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://www.fiverr.com");
-  res.header("Access-Control-Allow-Methods", "GET, POST");
-  next();
-});
+app.options('*', cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+}))
 
 const limiter = rateLimit({
   windowMs: 100000, // 1 minute

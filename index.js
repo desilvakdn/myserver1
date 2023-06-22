@@ -34,6 +34,12 @@ app.use(
   })
 );
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://www.fiverr.com");
+  res.header("Access-Control-Allow-Methods", "GET, POST");
+  next();
+});
+
 const limiter = rateLimit({
   windowMs: 100000, // 1 minute
   max: 280, // limit each user to 100 requests per windowMs

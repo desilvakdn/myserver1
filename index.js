@@ -667,7 +667,6 @@ app.get("/reveal/:usermail", async (req, res) => {
 
 app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
   let email = req.params.usermail;
-  let response = false;
 
   const connection = mysql1.createConnection({
     host: "89.117.9.154",
@@ -697,7 +696,7 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
       (err, results, fields) => {
         if (err) {
           console.error("Error querying the database: " + err.stack);
-          response = true;
+
           res.json({ error: true });
           return endConnection();
         }
@@ -714,18 +713,17 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
               (err, results, fields) => {
                 if (err) {
                   console.error("Error updating login status: " + err.stack);
-                  response = true;
+
                   res.json({ error: true });
                   return endConnection();
                 }
-                response = true;
-                res.json({ success: true });
+
+                res.json({ loginstatus: parseInt(req.params.loginstatus) });
                 endConnection();
               }
             );
           } else {
-            response = true;
-            res.json({ results: results });
+            res.json({ loginstatus: results[0].loginstatus });
             endConnection();
           }
         } else {
@@ -736,12 +734,12 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
             (err, results, fields) => {
               if (err) {
                 console.error("Error inserting new row: " + err.stack);
-                response = true;
+
                 res.json({ error: true });
                 return endConnection();
               }
               let loginstatus = parseInt(req.params.loginstatus);
-              if (loginstatus === 1) {
+              if (req.params.loginstatus === "1") {
                 connection.query(
                   "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
                   [loginstatus, email],
@@ -750,18 +748,17 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
                       console.error(
                         "Error updating login status: " + err.stack
                       );
-                      response = true;
+
                       res.json({ error: true });
                       return endConnection();
                     }
-                    response = true;
-                    res.json({ success: true });
+
+                    res.json({ loginstatus: 1 });
                     endConnection();
                   }
                 );
               } else {
-                response = true;
-                res.json({ success: true });
+                res.json({ loginstatus: 0 });
                 endConnection();
               }
             }

@@ -667,6 +667,7 @@ app.get("/reveal/:usermail", async (req, res) => {
 
 app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
   let email = req.params.usermail;
+  let response = false;
 
   const connection = mysql1.createConnection({
     host: "89.117.9.154",
@@ -689,6 +690,7 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
     (err, results, fields) => {
       if (err) {
         console.error("Error querying the database: " + err.stack);
+        response = true;
         res.json({ error: true });
         return;
       }
@@ -702,15 +704,18 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
             (err, results, fields) => {
               if (err) {
                 console.error("Error updating login status: " + err.stack);
+                response = true;
                 res.json({ error: true });
                 return;
               }
+              response = true;
               res.json({ success: true });
             }
           );
 
           return;
         } else {
+          response = true;
           res.json({ results: results });
           return;
         }
@@ -722,6 +727,7 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
           (err, results, fields) => {
             if (err) {
               console.error("Error inserting new row: " + err.stack);
+              response = true;
               res.json({ error: true });
               return;
             }
@@ -733,28 +739,35 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
                 (err, results, fields) => {
                   if (err) {
                     console.error("Error updating login status: " + err.stack);
+                    response = true;
                     res.json({ error: true });
                     return;
                   }
+                  response = true;
                   res.json({ success: true });
                 }
               );
             } else {
+              response = true;
               res.json({ success: true });
             }
           }
         );
       }
+
+      return;
     }
   );
 
-  connection.end(function (err) {
-    if (err) {
-      console.error("Error ending MySQL connection:", err);
-    } else {
-      console.log("MySQL connection ended successfully.");
-    }
-  });
+  if (true) {
+    connection.end(function (err) {
+      if (err) {
+        console.error("Error ending MySQL connection:", err);
+      } else {
+        console.log("MySQL connection ended successfully.");
+      }
+    });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

@@ -690,85 +690,89 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
       return;
     }
     console.log("Connected to the database");
-  });
 
-  connection.query(
-    `SELECT * FROM loginstatus WHERE useremail=?`,
-    [email],
-    (err, results, fields) => {
-      if (err) {
-        console.error("Error querying the database: " + err.stack);
-        response = true;
-        res.json({ error: true });
-        return;
-      }
+    connection.query(
+      `SELECT * FROM loginstatus WHERE useremail=?`,
+      [email],
+      (err, results, fields) => {
+        if (err) {
+          console.error("Error querying the database: " + err.stack);
+          response = true;
+          res.json({ error: true });
+          return endConnection();
+        }
 
-      if (results && results.length > 0) {
-        if (req.params.loginstatus === "1" || req.params.loginstatus === "0") {
-          let loginstatus = parseInt(req.params.loginstatus);
+        if (results && results.length > 0) {
+          if (
+            req.params.loginstatus === "1" ||
+            req.params.loginstatus === "0"
+          ) {
+            let loginstatus = parseInt(req.params.loginstatus);
+            connection.query(
+              "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
+              [loginstatus, email],
+              (err, results, fields) => {
+                if (err) {
+                  console.error("Error updating login status: " + err.stack);
+                  response = true;
+                  res.json({ error: true });
+                  return endConnection();
+                }
+                response = true;
+                res.json({ success: true });
+                endConnection();
+              }
+            );
+          } else {
+            response = true;
+            res.json({ results: results });
+            endConnection();
+          }
+        } else {
+          const newRow = { useremail: email };
           connection.query(
-            "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
-            [loginstatus, email],
+            "INSERT INTO loginstatus SET ?",
+            [newRow],
             (err, results, fields) => {
               if (err) {
-                console.error("Error updating login status: " + err.stack);
+                console.error("Error inserting new row: " + err.stack);
                 response = true;
                 res.json({ error: true });
-                return;
+                return endConnection();
               }
-              response = true;
-              res.json({ success: true });
+              let loginstatus = parseInt(req.params.loginstatus);
+              if (loginstatus === 1) {
+                connection.query(
+                  "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
+                  [loginstatus, email],
+                  (err, results, fields) => {
+                    if (err) {
+                      console.error(
+                        "Error updating login status: " + err.stack
+                      );
+                      response = true;
+                      res.json({ error: true });
+                      return endConnection();
+                    }
+                    response = true;
+                    res.json({ success: true });
+                    endConnection();
+                  }
+                );
+              } else {
+                response = true;
+                res.json({ success: true });
+                endConnection();
+              }
             }
           );
-
-          return;
-        } else {
-          response = true;
-          res.json({ results: results });
-          return;
         }
-      } else {
-        const newRow = { useremail: email };
-        connection.query(
-          "INSERT INTO loginstatus SET ?",
-          [newRow],
-          (err, results, fields) => {
-            if (err) {
-              console.error("Error inserting new row: " + err.stack);
-              response = true;
-              res.json({ error: true });
-              return;
-            }
-            let loginstatus = parseInt(req.params.loginstatus);
-            if (loginstatus === 1) {
-              connection.query(
-                "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
-                [loginstatus, email],
-                (err, results, fields) => {
-                  if (err) {
-                    console.error("Error updating login status: " + err.stack);
-                    response = true;
-                    res.json({ error: true });
-                    return;
-                  }
-                  response = true;
-                  res.json({ success: true });
-                }
-              );
-            } else {
-              response = true;
-              res.json({ success: true });
-            }
-          }
-        );
       }
+    );
+  });
 
-      return;
-    }
-  );
-
-  if (response) {
-    connection.end(function (err) {
+  function endConnection() {
+    connection.end((err) => {
       if (err) {
         console.error("Error ending MySQL connection:", err);
       } else {

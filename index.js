@@ -1,7 +1,21 @@
 const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
-
+const mysql1 = require("mysql");
+const connection = mysql1.createConnection({
+  host: "89.117.9.154",
+  user: "u327402158_admin",
+  password: "Dinuka@1869434",
+  database: "u327402158_user",
+  connectTimeout: 60000, // Adjust the timeout as needed
+});
+connection.connect((err) => {
+  if (err) {
+    console.error("Error connecting to the database: " + err.stack);
+    return;
+  }
+  console.log("Connected to the database");
+});
 const mysql = require("mysql2");
 const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
@@ -662,6 +676,78 @@ app.get("/reveal/:usermail", async (req, res) => {
       res.json({ error: error });
     }
   }
+});
+
+app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
+  let email = req.params.usermail;
+
+  connection.query(
+    `SELECT * FROM loginstatus WHERE useremail=?`,
+    [email],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error querying the database: " + err.stack);
+        res.json({ error: true });
+        return;
+      }
+
+      if (results && results.length > 0) {
+        if (req.params.loginstatus === "1" || req.params.loginstatus === "0") {
+          console.log("hi2");
+
+          let loginstatus = parseInt(req.params.loginstatus);
+          connection.query(
+            "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
+            [loginstatus, email],
+            (err, results, fields) => {
+              if (err) {
+                console.error("Error updating login status: " + err.stack);
+                res.json({ error: true });
+                return;
+              }
+              res.json({ success: true });
+            }
+          );
+
+          return;
+        } else {
+          console.log("hi");
+          res.json({ results: results });
+          return;
+        }
+      } else {
+        const newRow = { useremail: email };
+        connection.query(
+          "INSERT INTO loginstatus SET ?",
+          [newRow],
+          (err, results, fields) => {
+            if (err) {
+              console.error("Error inserting new row: " + err.stack);
+              res.json({ error: true });
+              return;
+            }
+            let loginstatus = parseInt(req.params.loginstatus);
+            if (loginstatus === 1) {
+              connection.query(
+                "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
+                [loginstatus, email],
+                (err, results, fields) => {
+                  if (err) {
+                    console.error("Error updating login status: " + err.stack);
+                    res.json({ error: true });
+                    return;
+                  }
+                  res.json({ success: true });
+                }
+              );
+            } else {
+              res.json({ success: true });
+            }
+          }
+        );
+      }
+    }
+  );
 });
 
 const PORT = process.env.PORT || 5000;

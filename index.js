@@ -2,20 +2,7 @@ const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
 const mysql1 = require("mysql");
-const connection = mysql1.createConnection({
-  host: "89.117.9.154",
-  user: "u327402158_admin",
-  password: "Dinuka@1869434",
-  database: "u327402158_user",
-  connectTimeout: 60000, // Adjust the timeout as needed
-});
-connection.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database: " + err.stack);
-    return;
-  }
-  console.log("Connected to the database");
-});
+
 const mysql = require("mysql2");
 const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
@@ -680,6 +667,24 @@ app.get("/reveal/:usermail", async (req, res) => {
 
 app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
   let email = req.params.usermail;
+
+  const connection = mysql1.createConnection({
+    host: "89.117.9.154",
+    user: "u327402158_admin",
+    password: "Dinuka@1869434",
+    database: "u327402158_user",
+    connectTimeout: 60000, // Adjust the timeout as needed
+  });
+
+  if (connection.state === "disconnected") {
+    connection.connect((err) => {
+      if (err) {
+        console.error("Error connecting to the database: " + err.stack);
+        return;
+      }
+      console.log("Connected to the database");
+    });
+  }
 
   connection.query(
     `SELECT * FROM loginstatus WHERE useremail=?`,

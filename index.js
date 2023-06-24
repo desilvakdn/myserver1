@@ -693,8 +693,6 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
 
       if (results && results.length > 0) {
         if (req.params.loginstatus === "1" || req.params.loginstatus === "0") {
-          console.log("hi2");
-
           let loginstatus = parseInt(req.params.loginstatus);
           connection.query(
             "UPDATE loginstatus SET loginstatus = ? WHERE useremail = ?",
@@ -711,7 +709,6 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
 
           return;
         } else {
-          console.log("hi");
           res.json({ results: results });
           return;
         }

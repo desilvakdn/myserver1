@@ -759,7 +759,7 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
     }
   );
 
-  if (true) {
+  if (response) {
     connection.end(function (err) {
       if (err) {
         console.error("Error ending MySQL connection:", err);

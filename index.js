@@ -676,6 +676,14 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
     database: "u327402158_user",
   });
 
+  connection.on("error", function (err) {
+    if (err.code === "ECONNRESET") {
+      res.json({ error: err });
+    } else {
+      res.json({ error: err });
+    }
+  });
+
   connection.connect((err) => {
     if (err) {
       console.error("Error connecting to the database: " + err.stack);

@@ -673,18 +673,15 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
     user: "u327402158_admin",
     password: "Dinuka@1869434",
     database: "u327402158_user",
-    connectTimeout: 60000, // Adjust the timeout as needed
   });
 
-  if (connection.state === "disconnected") {
-    connection.connect((err) => {
-      if (err) {
-        console.error("Error connecting to the database: " + err.stack);
-        return;
-      }
-      console.log("Connected to the database");
-    });
-  }
+  connection.connect((err) => {
+    if (err) {
+      console.error("Error connecting to the database: " + err.stack);
+      return;
+    }
+    console.log("Connected to the database");
+  });
 
   connection.query(
     `SELECT * FROM loginstatus WHERE useremail=?`,
@@ -750,6 +747,14 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
       }
     }
   );
+
+  connection.end(function (err) {
+    if (err) {
+      console.error("Error ending MySQL connection:", err);
+    } else {
+      console.log("MySQL connection ended successfully.");
+    }
+  });
 });
 
 const PORT = process.env.PORT || 5000;

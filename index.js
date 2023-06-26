@@ -780,11 +780,13 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
 });
 
 app.get("/chkvalid/:hash", async (req, res) => {
+  let response = checkhash(req.params.hash);
+  res.json({ valid: response });
+});
+
+function checkhash(hash) {
   const SECRET_KEY =
     "~!h0K/mUiX~|(p8`A2]54|@zY/7<NP)3sQE+|-7n3$92R-|K71kx%C=0M%@+kz5;r0U5_U;kM62TDQsF+f4v*37c0sbnIg3EIm~?9sm0`JDT;9[o_LIrdxqp*`H4b(Tn0@]x*FPzH117eH-@d[o52LYVHk&qaJgW16acPs{}1M=0M{?kr9xB4v'o*6s#}v*>9x6(PJ$";
-
-  let hash = req.params.hash;
-
   const [receivedHash, tokenValidityPeriod] = hash.split(":");
   const currentTime = Math.floor(Date.now() / 1000); // Current Unix timestamp in seconds
   const data = `${SECRET_KEY}:${tokenValidityPeriod}`;
@@ -796,22 +798,22 @@ app.get("/chkvalid/:hash", async (req, res) => {
 
   if (receivedHash !== generatedHash) {
     // Hash mismatch
-    res.json({ valid: false });
+    return false;
   }
 
   const receivedTokenValidityPeriod = parseInt(tokenValidityPeriod, 10);
   if (isNaN(receivedTokenValidityPeriod)) {
     // Invalid token validity period
-    res.json({ valid: false });
+    return false;
   }
 
   if (receivedTokenValidityPeriod < currentTime) {
     // Token has expired
-    res.json({ valid: false });
+    return false;
   }
 
-  res.json({ valid: true });
-});
+  return true;
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

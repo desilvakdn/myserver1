@@ -2,7 +2,7 @@ const fetch = (url) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url));
 const express = require("express");
 const mysql1 = require("mysql");
-
+const crypto = require("crypto");
 const mysql = require("mysql2");
 const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
@@ -777,6 +777,40 @@ app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
       }
     });
   }
+});
+
+app.get("/chkvalid/:hash", async (req, res) => {
+  const SECRET_KEY =
+    "~!h0K/mUiX~|(p8`A2]54|@zY/7<NP)3sQE+|-7n3$92R-|K71kx%C=0M%@+kz5;r0U5_U;kM62TDQsF+f4v*37c0sbnIg3EIm~?9sm0`JDT;9[o_LIrdxqp*`H4b(Tn0@]x*FPzH117eH-@d[o52LYVHk&qaJgW16acPs{}1M=0M{?kr9xB4v'o*6s#}v*>9x6(PJ$";
+
+  let hash = req.params.hash;
+
+  const [receivedHash, tokenValidityPeriod] = hash.split(":");
+  const currentTime = Math.floor(Date.now() / 1000); // Current Unix timestamp in seconds
+  const data = `${SECRET_KEY}:${tokenValidityPeriod}`;
+
+  const generatedHash = crypto
+    .createHmac("sha256", SECRET_KEY)
+    .update(data)
+    .digest("hex");
+
+  if (receivedHash !== generatedHash) {
+    // Hash mismatch
+    res.json({ valid: false });
+  }
+
+  const receivedTokenValidityPeriod = parseInt(tokenValidityPeriod, 10);
+  if (isNaN(receivedTokenValidityPeriod)) {
+    // Invalid token validity period
+    res.json({ valid: false });
+  }
+
+  if (receivedTokenValidityPeriod < currentTime) {
+    // Token has expired
+    res.json({ valid: false });
+  }
+
+  res.json({ valid: true });
 });
 
 const PORT = process.env.PORT || 5000;

@@ -28,12 +28,7 @@ const { google } = require("googleapis");
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
-app.use(
-  cors({
-    origin: "https://www.fiverr.com",
-    methods: ["GET", "POST", "OPTIONS"],
-  })
-);
+app.use(cors());
 
 const limiter = rateLimit({
   windowMs: 100000, // 1 minute

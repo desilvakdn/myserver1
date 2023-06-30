@@ -28,6 +28,7 @@ const { google } = require("googleapis");
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
+//
 app.use(cors());
 
 const limiter = rateLimit({

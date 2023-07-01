@@ -30,12 +30,6 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://www.fiverr.com");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
 app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
   fetch(
     "https://raw.githubusercontent.com/desilvakdn/cjdcdcj4tgt55t53vr3f3fev/main/dejdejde.json"
@@ -400,7 +394,6 @@ app.get("/titlesai/:words/:api", async (req, res) => {
     }
     return str;
   });
-
   res.json({ resp: removeBeforeIWill });
 });
 

@@ -28,8 +28,6 @@ const { google } = require("googleapis");
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
-//
-app.use(cors());
 
 const limiter = rateLimit({
   windowMs: 100000, // 1 minute
@@ -38,6 +36,7 @@ const limiter = rateLimit({
 
 app.use("/reveal", limiter);
 app.use(express.json());
+app.use(cors());
 
 app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
   fetch(

@@ -4,7 +4,6 @@ const express = require("express");
 const mysql1 = require("mysql");
 const crypto = require("crypto");
 const mysql = require("mysql2");
-const rateLimit = require("express-rate-limit");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 const creds = {
   type: "service_account",
@@ -28,13 +27,6 @@ const { google } = require("googleapis");
 const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require("cors");
-
-const limiter = rateLimit({
-  windowMs: 100000, // 1 minute
-  max: 280, // limit each user to 100 requests per windowMs
-});
-
-app.use("/reveal", limiter);
 app.use(express.json());
 app.use(cors({
   origin:"https://www.fiverr.com",
@@ -612,56 +604,6 @@ async function writeToGoogleSheet(userEmail, quota) {
 
   accessSpreadsheet().catch(console.error);
 }
-
-app.get("/reveal/:usermail", async (req, res) => {
-  if (req.rateLimit.remaining === 0) {
-    res.json({ error: "ratelimit" });
-  } else {
-    const auth = new google.auth.GoogleAuth({
-      credentials: creds,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    // Create a new Google Sheets API client with the loaded credentials
-    const sheets = google.sheets({ version: "v4", auth });
-
-    try {
-      // Load the values from the Google Sheet
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: "1ySFcbZ3VYqL64esOtoWfhpQwvxv50sLH3BOwsBA1xS0",
-        range: "Sheet1!A:B", // Replace with your sheet name and range
-      });
-
-      // Search for the user email in the loaded values
-      const values = response.data.values;
-      const index = values.findIndex((row) => row[0] === req.params.usermail);
-
-      // If the user email exists, return the corresponding quota value
-      if (index !== -1) {
-        const obj = JSON.parse(values[index][1]);
-        res.json({ obj: obj });
-      } else {
-        await writeToGoogleSheet(req.params.usermail, {
-          main_mate: 0,
-          gig_mate: 0,
-          mate_ai: 0,
-          auto_gig: 0,
-        });
-        res.json({
-          obj: {
-            main_mate: 0,
-            gig_mate: 0,
-            mate_ai: 0,
-            auto_gig: 0,
-          },
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      res.json({ error: error });
-    }
-  }
-});
 
 app.get("/chklogin/:usermail/:loginstatus", async (req, res) => {
   let email = req.params.usermail;

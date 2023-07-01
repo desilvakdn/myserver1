@@ -36,7 +36,10 @@ const limiter = rateLimit({
 
 app.use("/reveal", limiter);
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin:"https://www.fiverr.com",
+  methods: "GET,POST"
+}));
 
 app.get("/checkuser/:fname/:lfname/:usermail/:username", (req, res) => {
   fetch(

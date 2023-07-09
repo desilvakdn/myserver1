@@ -442,10 +442,10 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
         )
           .then((el) => el.json())
           .then((data) => {
-            var f_name = data["response"]["first_name"];
-            var l_name = data["response"]["last_name"];
-            var email = data["response"]["user_email"];
-            var username = data["response"]["user_login"];
+            var f_name =arrangephrase(data["response"]["first_name"]);
+            var l_name = arrangephrase(data["response"]["last_name"]);
+            var email = arrangephrase(data["response"]["user_email"]);
+            var username = arrangephrase(data["response"]["user_login"]);
             var userreg = data["response"]["user_registered"];
 
             fetch(
@@ -457,10 +457,10 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                 const firstKey = Object.keys(response_);
                 //let plan__ = response_[firstKey]["level_id"];
 
-                let a = req.params.fname;
-                let b = req.params.lfname;
-                let c = req.params.usermail;
-                let d = req.params.username;
+                let a = arrangephrase(req.params.fname);
+                let b = arrangephrase(req.params.lfname);
+                let c =arrangephrase( req.params.usermail);
+                let d = arrangephrase(req.params.username);
 
                 if (
                   f_name.toLowerCase() === a.toLowerCase() &&
@@ -749,6 +749,20 @@ function checkhash(hash) {
   }
 
   return true;
+}
+
+
+function arrangephrase(str) {
+  // Remove empty spaces
+  const stringWithoutSpaces = str.replace(/\s+/g, '');
+
+  // Remove leading and trailing spaces
+  const trimmedString = stringWithoutSpaces.trim();
+
+  // Convert to lowercase
+  const lowercaseString = trimmedString.toLowerCase();
+
+  return lowercaseString;
 }
 
 const PORT = process.env.PORT || 5000;

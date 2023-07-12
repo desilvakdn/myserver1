@@ -462,6 +462,9 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                 let a = arrangephrase(req.params.fname);
                 let b = arrangephrase(req.params.lfname);
                 let full_name = `${a} ${b}`.trim();
+                if (b === "*") {
+                  full_name = a;
+                }
 
                 let c = arrangephrase(req.params.usermail);
                 let d = arrangephrase(req.params.username);

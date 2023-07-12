@@ -444,7 +444,7 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
           .then((data) => {
             var f_name = arrangephrase(data["response"]["first_name"]);
             var l_name = arrangephrase(data["response"]["last_name"]);
-            let full_name1 = `${f_name} ${l_name}`.trim();
+            let full_name1 = arrangephrase(`${f_name} ${l_name}`.trim());
 
             var email = arrangephrase(data["response"]["user_email"]);
             var username = arrangephrase(data["response"]["user_login"]);
@@ -461,7 +461,7 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
 
                 let a = arrangephrase(req.params.fname);
                 let b = arrangephrase(req.params.lfname);
-                let full_name = `${a} ${b}`.trim();
+                let full_name = arrangephrase(`${a} ${b}`.trim());
                 if (b === "*") {
                   full_name = a;
                 }

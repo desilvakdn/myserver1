@@ -442,8 +442,10 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
         )
           .then((el) => el.json())
           .then((data) => {
-            var f_name =arrangephrase(data["response"]["first_name"]);
+            var f_name = arrangephrase(data["response"]["first_name"]);
             var l_name = arrangephrase(data["response"]["last_name"]);
+            let full_name1 = `${f_name} ${l_name}`.trim();
+
             var email = arrangephrase(data["response"]["user_email"]);
             var username = arrangephrase(data["response"]["user_login"]);
             var userreg = data["response"]["user_registered"];
@@ -459,12 +461,13 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
 
                 let a = arrangephrase(req.params.fname);
                 let b = arrangephrase(req.params.lfname);
-                let c =arrangephrase( req.params.usermail);
+                let full_name = `${a} ${b}`.trim();
+
+                let c = arrangephrase(req.params.usermail);
                 let d = arrangephrase(req.params.username);
 
                 if (
-                  f_name.toLowerCase() === a.toLowerCase() &&
-                  l_name.toLowerCase() === b.toLowerCase() &&
+                  full_name1.toLowerCase() === full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
                   (firstKey.includes("4") ||
@@ -513,8 +516,7 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                     });
                   }
                 } else if (
-                  f_name.toLowerCase() === a.toLowerCase() &&
-                  l_name.toLowerCase() === b.toLowerCase() &&
+                  full_name1.toLowerCase() === full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
                   firstKey.includes("1")
@@ -751,10 +753,9 @@ function checkhash(hash) {
   return true;
 }
 
-
 function arrangephrase(str) {
   // Remove empty spaces
-  const stringWithoutSpaces = str.replace(/\s+/g, '');
+  const stringWithoutSpaces = str.replace(/\s+/g, "");
 
   // Remove leading and trailing spaces
   const trimmedString = stringWithoutSpaces.trim();

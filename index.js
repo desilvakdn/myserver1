@@ -469,8 +469,11 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                 let c = arrangephrase(req.params.usermail);
                 let d = arrangephrase(req.params.username);
 
+                //full_name1.toLowerCase() === full_name.toLowerCase() &&
+
                 if (
-                  full_name1.toLowerCase() === full_name.toLowerCase() &&
+                  full_name1.toLowerCase() &&
+                  full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
                   (firstKey.includes("4") ||
@@ -519,7 +522,8 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                     });
                   }
                 } else if (
-                  full_name1.toLowerCase() === full_name.toLowerCase() &&
+                  full_name1.toLowerCase() &&
+                  full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
                   username.toLowerCase() === d.toLowerCase() &&
                   firstKey.includes("1")

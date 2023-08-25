@@ -475,10 +475,12 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   full_name1.toLowerCase() &&
                   full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
-                  username.toLowerCase() === d.toLowerCase() &&
+                  username.toLowerCase() &&
+                  d.toLowerCase() &&
                   (firstKey.includes("4") ||
                     firstKey.includes("5") ||
-                    firstKey.includes("6"))
+                    firstKey.includes("6") ||
+                    firstKey.includes("7"))
                 ) {
                   if (firstKey.includes("4")) {
                     let expired = data743["response"]["4"].is_expired;
@@ -514,6 +516,23 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                         end: false,
                       });
                     }
+                  } else if (firstKey.includes("7")) {
+                    let expired = data743["response"]["7"].is_expired;
+                    if (!expired) {
+                      let expiretime = data743["response"]["7"].expire_time;
+
+                      res.json({
+                        response: "lion",
+                        userreg: userreg,
+                        end: expiretime,
+                      });
+                    } else {
+                      res.json({
+                        response: "lobster",
+                        userreg: userreg,
+                        end: false,
+                      });
+                    }
                   } else {
                     res.json({
                       response: "lion",
@@ -525,7 +544,8 @@ app.get("/target/:fname/:lfname/:usermail/:username/:plan", (req, res) => {
                   full_name1.toLowerCase() &&
                   full_name.toLowerCase() &&
                   email.toLowerCase() === c.toLowerCase() &&
-                  username.toLowerCase() === d.toLowerCase() &&
+                  username.toLowerCase() &&
+                  d.toLowerCase() &&
                   firstKey.includes("1")
                 ) {
                   res.json({

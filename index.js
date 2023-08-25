@@ -151,7 +151,24 @@ app.get("/getf", async (req, res) => {
       .then((el) => el.json())
       .then((data) => res.json({ data: data }));
   } catch (error) {
-    res.json({ data: "" });
+    res.json({
+      data: {
+        quick_: [
+          "dashboard_",
+          "profile_",
+          "subscription_",
+          "contact_",
+          "logout_",
+        ],
+        url_set: [
+          "https://syntaximos.com/my-account/?ihc_ap_menu=overview",
+          "https://syntaximos.com/my-account/?ihc_ap_menu=profile",
+          "https://syntaximos.com/my-account/?ihc_ap_menu=subscription",
+          "https://syntaximos.com/contact-us/",
+          "https://syntaximos.com/my-account/?ihcdologout=1",
+        ],
+      },
+    });
   }
 });
 

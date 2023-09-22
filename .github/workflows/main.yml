@@ -39,3 +39,4 @@ jobs:
           git pull origin main
           git status
           npm install i
+          pm2 restart index.js

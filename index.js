@@ -13,6 +13,10 @@ app.get("/hellfire", (req, res) => {
   res.json({ message: "Hello World" });
 });
 
+app.get("/helldash", (req, res) => {
+  res.json({ message: "Hello Dinuka" });
+});
+
 app.get("/getf", async (req, res) => {
   try {
     fetch(

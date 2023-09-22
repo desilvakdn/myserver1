@@ -9,6 +9,10 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 
+app.get("/hellfire", (req, res) => {
+  res.json({ message: "Hello World" });
+});
+
 app.get("/getf", async (req, res) => {
   try {
     fetch(
